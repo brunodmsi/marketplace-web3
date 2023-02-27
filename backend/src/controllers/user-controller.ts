@@ -12,6 +12,9 @@ class UserController {
 		const userService = new UserService();
 		const nonce = await userService.getNonce(publicAddress);
 
+		if (!nonce)
+			throw HttpException.badRequest(400, 'User with nonce not found');
+
 		return reply.send({
 			nonce
 		});
