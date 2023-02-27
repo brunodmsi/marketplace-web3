@@ -1,4 +1,3 @@
-import { SignerService } from "./signer";
 import { prismaClient } from "../database/prisma-client";
 import { HttpException } from "../utils/helpers/http-exception";
 import randomString from "../utils/helpers/random-string";
@@ -10,7 +9,7 @@ export type User = {
 }
 
 export class UserService {
-	async create(publicAddress: string) {
+	public async create(publicAddress: string) {
 		const user = await prismaClient.user.create({
 			data: {
 				public_address: publicAddress,
@@ -21,23 +20,19 @@ export class UserService {
 		return user;
 	}
 
-	async getNonce(publicAddress: string) {
-		try {
-			const user = await prismaClient.user.findFirst({
-				where: {
-					public_address: publicAddress
-				}
-			});
+	public async getNonce(publicAddress: string) {
+		const user = await prismaClient.user.findFirst({
+			where: {
+				public_address: publicAddress
+			}
+		});
 
-			if (!user) throw Error();
+		if (!user) return null;
 
-			return user.nonce;
-		} catch (e) {
-			throw HttpException.badRequest();
-		}
+		return user.nonce;
 	}
 
-	async updateNonce(publicAddress: string, newNonce: string) {
+	public async updateNonce(publicAddress: string, newNonce: string) {
 		try {
 			await prismaClient.user.update({
 				where: {
@@ -53,7 +48,7 @@ export class UserService {
 	}
 
 
-	async findOrCreate(params: { publicAddress: string }) {
+	public async findOrCreate(params: { publicAddress: string }) {
 		if (!params.publicAddress) return null;
 
 		let user = await prismaClient.user.findUnique({
@@ -69,3 +64,4 @@ export class UserService {
 		return user;
 	}
 }
+

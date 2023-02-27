@@ -1,49 +1,44 @@
-import { User } from "@prisma/client";
-import { SignerService } from "../services/signer";
-import { UserService } from "../services/user";
+import { FastifyReply, FastifyRequest } from "fastify";
 import { HttpException } from "../utils/helpers/http-exception";
+import { UserService, } from "../services/user";
+import { SignerService } from "../services/signer";
 
-export default class UserController {
-	protected userService;
+class UserController {
+	public async getNonce(req: FastifyRequest, reply: FastifyReply) {
+		const { publicAddress } = req.body as {
+			publicAddress: string
+		};
 
-	constructor() {
-		this.userService = new UserService();
+		const userService = new UserService();
+		const nonce = await userService.getNonce(publicAddress);
+
+		return reply.send({
+			nonce
+		});
 	}
 
-	async getNonce(params: { publicAddress: string }) {
-		const nonce = this.userService.getNonce(params.publicAddress);
+	public async authenticate(req: FastifyRequest, reply: FastifyReply) {
+		const { publicAddress, signature } = req.body as {
+			publicAddress: string;
+			signature: string;
+		}
 
-		return nonce;
-	}
+		const signer = new SignerService(publicAddress);
 
-	async authenticate(params: { publicAddress: string, signature: string }) {
-		const signer = new SignerService(params.publicAddress);
-
-		const isUserVerified = signer.verifySignature({ signature: params.signature });
+		const isUserVerified = await signer.isSignatureVerified({ signature });
 
 		if (!isUserVerified) {
 			throw HttpException.unauthorized();
 		}
 
-		return {
-			wallet: params.publicAddress
-		};
+		const token = await reply.jwtSign({
+			sub: publicAddress
+		});
+
+		return reply.send({
+			jwt: token
+		});
 	}
-
-	async findOrCreate(publicAddress: string): Promise<User | null> {
-		try {
-			const user = await this.userService.findOrCreate({ publicAddress });
-			return user;
-		} catch (err) {
-			throw HttpException.badRequest();
-		}
-	}	
-
-	async create(publicAddress: string): Promise<void> {
-		try {
-			this.userService.create(publicAddress);
-		} catch (err) {
-			throw HttpException.badRequest();
-		}
-	}	
 }
+
+export default new UserController();

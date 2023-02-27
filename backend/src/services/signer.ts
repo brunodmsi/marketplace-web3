@@ -17,7 +17,7 @@ export class SignerService {
 		}
 	}
 
-	async verifySignature(params: { signature: string }): Promise<Boolean> {
+	async isSignatureVerified(params: { signature: string }): Promise<Boolean> {
 		try {
 			const user = await this.userService.findOrCreate({ publicAddress: this.walletId });
 
