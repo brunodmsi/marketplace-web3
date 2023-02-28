@@ -1,11 +1,18 @@
 import { FastifyInstance } from 'fastify';
 import userController from './controllers/user-controller';
+import storeController from './controllers/store-controller';
 
 const health = async (app: FastifyInstance) => {
 	return [
-		app.get('/', async () => {
-			return 'Ok';
-		}),
+		app.get(
+			'/',
+			{
+				preHandler: app.auth([app.verifyJWT]),
+			},
+			async () => {
+				return 'Ok';
+			}
+		),
 	];
 };
 
@@ -16,9 +23,22 @@ const user = async (app: FastifyInstance) => {
 	];
 };
 
+const store = async (app: FastifyInstance) => {
+	return [
+		app.post(
+			'/create',
+			{
+				preHandler: app.auth([app.verifyJWT]),
+			},
+			storeController.create
+		),
+	];
+};
+
 export function routes(app: FastifyInstance): FastifyInstance {
-	app.register(health, { prefix: '/health' }),
-		app.register(user, { prefix: '/user' });
+	app.register(health, { prefix: '/health' });
+	app.register(user, { prefix: '/user' });
+	app.register(store, { prefix: '/store' });
 
 	return app;
 }

@@ -1,17 +1,33 @@
 generator client {
-	provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-	provider = "postgresql"	
-	url = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 //models...
 model User {
-	id String @id @default(uuid())
-	public_address String @unique
-	nonce String
+  id            String @id @default(uuid())
+  public_address String @unique
+  nonce         String
 
-	@@map("users")
+  created_at DateTime @default(now())
+  stores Store[]
+
+  @@map("users")
+}
+
+model Store {
+  id String @id @default(uuid())
+
+  created_at DateTime @default(now())
+
+  owner User @relation(fields: [owner_id], references: [id])
+  owner_id String
+
+  name String
+
+	@@map("stores")
 }
