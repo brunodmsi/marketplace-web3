@@ -30,13 +30,15 @@ mount().then(async (server) => {
 
 	const { app } = server;
 
-	app.listen({
+	app.listen(
+		{
 			port
 		},
 		(err: Error | null, address: string) => {
+			if (!err) return;
+
 			app.log.error(err);
 			app.log.error(address);
-			process.exit(1);
 		}
 	);
 });
