@@ -4,22 +4,43 @@ import storeController from './controllers/store-controller';
 
 const health = async (app: FastifyInstance) => {
 	return [
-		app.get(
-			'/',
-			{
-				preHandler: app.auth([app.verifyJWT]),
-			},
-			async () => {
-				return 'Ok';
-			}
-		),
+		app.get('/', async () => {
+			return 'Ok';
+		}),
 	];
 };
 
 const user = async (app: FastifyInstance) => {
 	return [
-		app.post('/get-nonce', userController.getNonce),
-		app.post('/authenticate', userController.authenticate),
+		app.post(
+			'/get-nonce',
+			{
+				schema: {
+					body: {
+						type: 'object',
+						required: ['publicAddress'],
+						properties: { publicAddress: { type: 'string' } },
+					},
+				},
+			},
+			userController.getNonce
+		),
+		app.post(
+			'/authenticate',
+			{
+				schema: {
+					body: {
+						type: 'object',
+						required: ['publicAddress', 'signature'],
+						properties: {
+							publicAddress: { type: 'string' },
+							signature: { type: 'string' },
+						},
+					},
+				},
+			},
+			userController.authenticate
+		),
 	];
 };
 
@@ -29,6 +50,15 @@ const store = async (app: FastifyInstance) => {
 			'/create',
 			{
 				preHandler: app.auth([app.verifyJWT]),
+				schema: {
+					body: {
+						type: 'object',
+						required: ['name'],
+						properties: {
+							name: { type: 'string' },
+						},
+					},
+				},
 			},
 			storeController.create
 		),
