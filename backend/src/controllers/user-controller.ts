@@ -34,9 +34,12 @@ class UserController {
 			throw HttpException.unauthorized();
 		}
 
-		const token = await reply.jwtSign({
-			sub: publicAddress,
-		});
+		const userService = new UserService();
+		const user = await userService.findOrCreate({ publicAddress });
+
+		if (!user) throw HttpException.badRequest();
+
+		const token = await reply.jwtSign(user);
 
 		return reply.send({
 			jwt: token,

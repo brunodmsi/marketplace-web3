@@ -15,7 +15,7 @@ export function verifyJWT(
 	request.jwtVerify({}, onVerify);
 
 	function onVerify(err: Error | null, decoded: any) {
-		if (err || !decoded.sub) {
+		if (err || !decoded.id) {
 			return done(new Error('Token not valid'));
 		}
 
