@@ -1,47 +1,24 @@
-import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import { FastifyReply, FastifyRequest } from 'fastify';
 
-import { FastifyContextSchema } from '../config';
-import { HttpException } from '../utils/helpers/http-exception';
-
-export async function authorization(
-	req: FastifyRequest,
+export function verifyJWT(
+	request: FastifyRequest,
 	_: FastifyReply,
-	app: FastifyInstance
+	done: (error?: Error) => void
 ) {
-	if (req.raw.method === 'OPTIONS') return true;
+	const bearerToken = request.headers.authorization;
+	const jwt = bearerToken?.replace('Bearer ', '');
 
-	try {
-		const context = req.context as FastifyContextSchema;
+	if (!jwt) {
+		return done(new Error('Missing token header'));
+	}
 
-		if (!context.schema?.properties?.protected?.method) return false;
+	request.jwtVerify({}, onVerify);
 
-		const jwt = req.headers.authorization;
-
-		if (!jwt) throw Error();
-
-		const tokenDecoded = app.jwt.decode(jwt.replace('Bearer ', '')) as {
-			sub: string;
-		};
-
-		const session = {
-			publicAddress: tokenDecoded.sub,
-		};
-
-		const reqParams = req.params as {
-			publicAddress?: string;
-		};
-
-		if (
-			reqParams.publicAddress &&
-			reqParams.publicAddress.toLowerCase() !==
-				session.publicAddress.toLowerCase()
-		) {
-			throw Error();
+	function onVerify(err: Error | null, decoded: any) {
+		if (err || !decoded.sub) {
+			return done(new Error('Token not valid'));
 		}
 
-		return true;
-	} catch (e) {
-		console.log(e);
-		throw HttpException.unauthorized();
+		done();
 	}
 }

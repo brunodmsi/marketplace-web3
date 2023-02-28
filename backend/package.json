@@ -11,10 +11,12 @@
 		"format": "prettier --write \"**/*.{ts,.json}\""
 	},
 	"dependencies": {
+		"@fastify/auth": "^4.2.0",
 		"@fastify/jwt": "^6.6.0",
 		"@prisma/client": "4.10.1",
 		"ethers": "^6.0.8",
 		"fastify": "^4.13.0",
+		"fastify-plugin": "^4.5.0",
 		"http-errors": "^2.0.0"
 	},
 	"devDependencies": {
@@ -22,7 +24,6 @@
 		"@types/http-errors": "^2.0.1",
 		"@types/node": "^18.14.1",
 		"@typescript-eslint/eslint-plugin": "^5.0.0",
-		"add": "^2.0.6",
 		"eslint": "^8.0.1",
 		"eslint-config-standard-with-typescript": "^34.0.0",
 		"eslint-plugin-import": "^2.25.2",

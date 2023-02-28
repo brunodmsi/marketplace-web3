@@ -1,8 +1,9 @@
 import Fastify, { FastifyInstance } from 'fastify';
+import fastifyAuth from '@fastify/auth';
 import fastifyJwt from '@fastify/jwt';
 import config from './config';
 import { router } from './routes';
-import { authorization } from './middlewares/authorization';
+import { verifyJWT } from './middlewares/authorization';
 
 const mount = async () => {
 	const app: FastifyInstance = Fastify({ logger: true });
@@ -10,13 +11,12 @@ const mount = async () => {
 	app.register(fastifyJwt, {
 		secret: config.jwt.secret,
 	});
+	app.register(fastifyAuth);
+
+	app.decorate('verifyJWT', verifyJWT);
 
 	// TODO: cors
 	// TODO: sessioninit
-	//
-	app.addHook('onRequest', async (req, res) => {
-		await authorization(req, res, app);
-	});
 
 	await router(app);
 
