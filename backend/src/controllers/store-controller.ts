@@ -1,5 +1,6 @@
+import { User } from '@prisma/client';
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { HttpException } from '../utils/helpers/http-exception';
+import { prismaClient } from '../database/prisma-client';
 
 class StoreController {
 	public async create(req: FastifyRequest, reply: FastifyReply) {
@@ -7,7 +8,23 @@ class StoreController {
 			name: string;
 		};
 
-		const ownerId = reply.context;
+		try {
+			const user = req.user as User;
+			const ownerId = user.id;
+
+			await prismaClient.store.create({
+				data: {
+					owner_id: ownerId,
+					name,
+				},
+			});
+
+			reply.send({
+				success: true,
+			});
+		} catch (e) {
+			return e;
+		}
 	}
 }
 
