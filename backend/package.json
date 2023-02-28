@@ -1,39 +1,38 @@
 {
-  "name": "backend",
-  "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT",
-  "type": "module",
-  "scripts": {
-    "start": "tsx src/server.ts",
-    "dev": "tsx watch src/server.ts",
-    "build": "tsup src",
-    "lint:fix": "eslint --fix --ext .ts",
-    "format": "prettier --write \"**/*.{ts,.json}\""
-  },
-  "dependencies": {
-    "@fastify/jwt": "^6.6.0",
-    "@prisma/client": "4.10.1",
-    "ethers": "^6.0.8",
-    "fastify": "^4.13.0",
-    "http-errors": "^2.0.0"
-  },
-  "devDependencies": {
-    "@types/fastify-jwt": "^0.8.1",
-    "@types/http-errors": "^2.0.1",
-    "@types/node": "^18.14.1",
-    "@typescript-eslint/eslint-plugin": "^5.0.0",
-    "add": "^2.0.6",
-    "eslint": "^8.0.1",
-    "eslint-config-standard-with-typescript": "^34.0.0",
-    "eslint-plugin-import": "^2.25.2",
-    "eslint-plugin-n": "^15.0.0",
-    "eslint-plugin-promise": "^6.0.0",
-    "prettier": "^2.8.4",
-    "prisma": "^4.10.1",
-    "tsup": "^6.6.3",
-    "tsx": "^3.12.3",
-    "typescript": "*",
-    "yarn": "^1.22.19"
-  }
+	"name": "backend",
+	"version": "1.0.0",
+	"main": "index.js",
+	"license": "MIT",
+	"scripts": {
+		"start": "tsx src/server.ts",
+		"dev": "tsx watch src/server.ts",
+		"build": "tsup src",
+		"lint:fix": "eslint --fix --ext .ts",
+		"format": "prettier --write \"**/*.{ts,.json}\""
+	},
+	"dependencies": {
+		"@fastify/jwt": "^6.6.0",
+		"@prisma/client": "4.10.1",
+		"ethers": "^6.0.8",
+		"fastify": "^4.13.0",
+		"http-errors": "^2.0.0"
+	},
+	"devDependencies": {
+		"@types/fastify-jwt": "^0.8.1",
+		"@types/http-errors": "^2.0.1",
+		"@types/node": "^18.14.1",
+		"@typescript-eslint/eslint-plugin": "^5.0.0",
+		"add": "^2.0.6",
+		"eslint": "^8.0.1",
+		"eslint-config-standard-with-typescript": "^34.0.0",
+		"eslint-plugin-import": "^2.25.2",
+		"eslint-plugin-n": "^15.0.0",
+		"eslint-plugin-promise": "^6.0.0",
+		"prettier": "^2.8.4",
+		"prisma": "^4.10.1",
+		"tsup": "^6.6.3",
+		"tsx": "^3.12.3",
+		"typescript": "*",
+		"yarn": "^1.22.19"
+	}
 }

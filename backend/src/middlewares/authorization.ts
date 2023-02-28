@@ -1,44 +1,42 @@
-import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
-import { FastifyContextSchema } from '../config'
-import { HttpException } from '../utils/helpers/http-exception'
+import { FastifyContextSchema } from '../config';
+import { HttpException } from '../utils/helpers/http-exception';
 
 export async function authorization(
-	req: FastifyRequest, 
-	_: FastifyReply, 
+	req: FastifyRequest,
+	_: FastifyReply,
 	app: FastifyInstance
 ) {
-	if (req.raw.method === "OPTIONS") return true;
+	if (req.raw.method === 'OPTIONS') return true;
 
 	try {
-		const context = req.context as FastifyContextSchema; 
+		const context = req.context as FastifyContextSchema;
 
-		if (!context.schema?.properties?.protected?.method) 
-			return false;
+		if (!context.schema?.properties?.protected?.method) return false;
 
 		const jwt = req.headers.authorization;
 
 		if (!jwt) throw Error();
 
-		const tokenDecoded = app.jwt.decode(jwt.replace("Bearer ", "")) as {
+		const tokenDecoded = app.jwt.decode(jwt.replace('Bearer ', '')) as {
 			sub: string;
 		};
 
 		const session = {
-			publicAddress: tokenDecoded.sub
+			publicAddress: tokenDecoded.sub,
 		};
 
 		const reqParams = req.params as {
 			publicAddress?: string;
-		}	
+		};
 
 		if (
-			reqParams.publicAddress && (
-				reqParams.publicAddress.toLowerCase() !==
-				session.publicAddress.toLowerCase()	
-			)
+			reqParams.publicAddress &&
+			reqParams.publicAddress.toLowerCase() !==
+				session.publicAddress.toLowerCase()
 		) {
-				throw Error();
+			throw Error();
 		}
 
 		return true;
@@ -47,4 +45,3 @@ export async function authorization(
 		throw HttpException.unauthorized();
 	}
 }
-

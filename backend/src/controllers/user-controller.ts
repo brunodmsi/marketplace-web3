@@ -1,12 +1,12 @@
-import { FastifyReply, FastifyRequest } from "fastify";
-import { HttpException } from "../utils/helpers/http-exception";
-import { UserService, } from "../services/user";
-import { SignerService } from "../services/signer";
+import { FastifyReply, FastifyRequest } from 'fastify';
+import { HttpException } from '../utils/helpers/http-exception';
+import { UserService } from '../services/user';
+import { SignerService } from '../services/signer';
 
 class UserController {
 	public async getNonce(req: FastifyRequest, reply: FastifyReply) {
 		const { publicAddress } = req.body as {
-			publicAddress: string
+			publicAddress: string;
 		};
 
 		const userService = new UserService();
@@ -16,7 +16,7 @@ class UserController {
 			throw HttpException.badRequest(400, 'User with nonce not found');
 
 		return reply.send({
-			nonce
+			nonce,
 		});
 	}
 
@@ -24,7 +24,7 @@ class UserController {
 		const { publicAddress, signature } = req.body as {
 			publicAddress: string;
 			signature: string;
-		}
+		};
 
 		const signer = new SignerService(publicAddress);
 
@@ -35,11 +35,11 @@ class UserController {
 		}
 
 		const token = await reply.jwtSign({
-			sub: publicAddress
+			sub: publicAddress,
 		});
 
 		return reply.send({
-			jwt: token
+			jwt: token,
 		});
 	}
 }

@@ -1,4 +1,4 @@
-import Fastify, { FastifyInstance } from 'fastify'
+import Fastify, { FastifyInstance } from 'fastify';
 import fastifyJwt from '@fastify/jwt';
 import config from './config';
 import { router } from './routes';
@@ -8,31 +8,31 @@ const mount = async () => {
 	const app: FastifyInstance = Fastify({ logger: true });
 
 	app.register(fastifyJwt, {
-		secret: config.jwt.secret
+		secret: config.jwt.secret,
 	});
 
 	// TODO: cors
 	// TODO: sessioninit
 	//
-	app.addHook("onRequest", async (req, res) => {
-    await authorization(req, res, app);
-  });
+	app.addHook('onRequest', async (req, res) => {
+		await authorization(req, res, app);
+	});
 
 	await router(app);
 
 	return {
-		app
-	}
-}
+		app,
+	};
+};
 
-mount().then(async (server) => {
+mount().then(async server => {
 	const port = +(process?.env?.PORT ?? 8080);
 
 	const { app } = server;
 
 	app.listen(
 		{
-			port
+			port,
 		},
 		(err: Error | null, address: string) => {
 			if (!err) return;
@@ -42,5 +42,3 @@ mount().then(async (server) => {
 		}
 	);
 });
-
-

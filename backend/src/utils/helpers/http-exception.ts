@@ -2,7 +2,7 @@ import createError from 'http-errors';
 
 export class HttpException {
 	static factory(code: number, msg?: string) {
-		return createError(+(code), msg ?? 'Error');
+		return createError(+code, msg ?? 'Error');
 	}
 
 	static badRequest(code?: number, msg?: string) {
