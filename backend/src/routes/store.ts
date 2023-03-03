@@ -17,7 +17,6 @@ const store = async (app: FastifyInstance) => {
 							networks: {
 								type: 'array',
 								items: { type: 'string' },
-								default: [],
 							},
 						},
 					},

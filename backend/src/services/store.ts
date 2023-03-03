@@ -1,14 +1,72 @@
 import { prismaClient } from '../database/prisma-client';
+import { StoreCreate, StoreUpdate } from '../interfaces/store';
+import { User } from '../interfaces/user';
+import { HttpException } from '../utils/helpers/http-exception';
 
-export class StoreService {
-	async create(params: { name: string; ownerId: string }) {
-		if (!params.name || !params.ownerId) return null;
+class StoreService {
+	async create({ name, description, networks }: StoreCreate, auth: User) {
+		const ownerId = auth.id;
 
-		await prismaClient.store.create({
+		const store = await prismaClient.store.create({
 			data: {
-				name: params.name,
-				owner_id: params.ownerId,
+				owner_id: ownerId,
+				name,
+				description,
+				networks,
 			},
 		});
+
+		return store;
+	}
+
+	async update(id: string, data: StoreUpdate, auth: User) {
+		const store = await prismaClient.store.findFirst({
+			where: {
+				id,
+			},
+		});
+
+		if (!store) {
+			throw HttpException.badRequest('Store not found');
+		}
+
+		if (auth.id !== store.owner_id) {
+			throw HttpException.badRequest('Auth user is not owner of the store');
+		}
+
+		const updatedStore = await prismaClient.store.update({
+			where: {
+				id,
+			},
+			data,
+		});
+
+		return updatedStore;
+	}
+
+	async delete(id: string, auth: User) {
+		const store = await prismaClient.store.findFirst({
+			where: {
+				id,
+			},
+		});
+
+		if (!store) {
+			throw HttpException.badRequest('Store not found');
+		}
+
+		if (auth.id !== store.owner_id) {
+			throw HttpException.badRequest('Auth user is not owner of the store');
+		}
+
+		await prismaClient.store.delete({
+			where: {
+				id,
+			},
+		});
+
+		return;
 	}
 }
+
+export default new StoreService();

@@ -1,28 +1,22 @@
-import { Store, User } from '@prisma/client';
 import { FastifyReply, FastifyRequest } from 'fastify';
+
 import { prismaClient } from '../database/prisma-client';
+import { StoreCreate, StoreUpdate } from '../interfaces/store';
+import { User } from '../interfaces/user';
+import storeService from '../services/store';
 import { HttpException } from '../utils/helpers/http-exception';
 
 class StoreController {
 	public async create(req: FastifyRequest, reply: FastifyReply) {
-		const { name, description, networks } = req.body as Store;
+		const { name, description, networks } = req.body as StoreCreate;
 
 		try {
-			const user = req.user as User;
-			const ownerId = user.id;
+			const response = await storeService.create(
+				{ name, description, networks },
+				req.user as User
+			);
 
-			await prismaClient.store.create({
-				data: {
-					owner_id: ownerId,
-					name,
-					description,
-					networks,
-				},
-			});
-
-			reply.send({
-				success: true,
-			});
+			reply.send(response);
 		} catch (e) {
 			throw HttpException.badRequest();
 		}
@@ -33,19 +27,14 @@ class StoreController {
 			id: string;
 		};
 
-		const body = req.body as Partial<Store>;
+		const body = req.body as StoreUpdate;
 
 		try {
-			const updatedStore = await prismaClient.store.update({
-				where: {
-					id,
-				},
-				data: body,
-			});
+			const response = await storeService.update(id, body, req.user as User);
 
-			reply.send(updatedStore);
+			reply.send(response);
 		} catch (e) {
-			throw HttpException.badRequest();
+			return e;
 		}
 	}
 
@@ -65,15 +54,11 @@ class StoreController {
 		};
 
 		try {
-			await prismaClient.store.delete({
-				where: {
-					id,
-				},
-			});
+			await storeService.delete(id, req.user as User);
 
 			reply.send();
 		} catch (e) {
-			throw HttpException.badRequest();
+			return e;
 		}
 	}
 }

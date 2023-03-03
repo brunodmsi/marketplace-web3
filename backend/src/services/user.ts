@@ -2,12 +2,6 @@ import { prismaClient } from '../database/prisma-client';
 import { HttpException } from '../utils/helpers/http-exception';
 import randomString from '../utils/helpers/random-string';
 
-export type User = {
-	public_address: string;
-	nonce: string;
-	id: string;
-};
-
 export class UserService {
 	public async create(publicAddress: string) {
 		const user = await prismaClient.user.create({
