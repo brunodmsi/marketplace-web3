@@ -31,6 +31,8 @@ model Store {
 	owner User @relation(fields: [owner_id], references: [id])
 	owner_id String
 
+	networks String[]
+
 	products Product[]
 	user_carts UserCart[]
 
