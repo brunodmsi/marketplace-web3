@@ -7,45 +7,75 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-//models...
 model User {
   id            String @id @default(uuid())
+	email String? @unique
   public_address String @unique
   nonce         String
 
   created_at DateTime @default(now())
-	organizations Organization[]
+
+	stores Store[]
+	user_carts UserCart[]
 
   @@map("users")
 }
 
-model Organization {
+model Store {
   id String @id @default(uuid())
 	created_at DateTime @default(now())
 
 	name String
+	description String
 
 	owner User @relation(fields: [owner_id], references: [id])
 	owner_id String
 
-	payments Payment[]
+	products Product[]
+	user_carts UserCart[]
 
-	@@map("organizations")
+	@@map("stores")
 }
 
-model Payment {
+model Product {
   id String @id @default(uuid())
 	created_at DateTime @default(now())
 
-	organization Organization @relation(fields: [organization_id], references: [id])
-	organization_id String
+	store Store @relation(fields: [store_id], references: [id])
+	store_id String
 
-	payer_public_address String
-
+	name String
 	value Float
 	description String?
 
-	type String @default("invoice")
+	@@map("products")
+}
 
-	@@map("payments")
+model UserCart {
+  id String @id @default(uuid())
+	created_at DateTime @default(now())
+
+	user_id String
+	user User @relation(fields: [user_id], references: [id])
+
+	store Store @relation(fields: [store_id], references: [id])
+	store_id String
+
+	cart_products CartProduct[]
+
+	@@map("user_carts")
+}
+
+model CartProduct {
+  id String @id @default(uuid())
+	created_at DateTime @default(now())
+
+	user_cart_id String
+	user_cart UserCart @relation(fields: [user_cart_id], references: [id])
+
+	name String
+	value Float
+	description String?
+
+	@@map("cart_products")
 }
