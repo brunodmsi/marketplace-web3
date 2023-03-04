@@ -24,6 +24,9 @@ class ProductService {
 			where: {
 				id,
 			},
+			include: {
+				store: true,
+			},
 		});
 
 		if (!product) {
