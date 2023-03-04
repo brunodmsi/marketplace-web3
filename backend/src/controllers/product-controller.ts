@@ -4,6 +4,7 @@ import { prismaClient } from '../database/prisma-client';
 import { ProductCreate, ProductUpdate } from '../interfaces/product';
 import { HttpException } from '../utils/helpers/http-exception';
 import productService from '../services/product';
+import { User } from '../interfaces/user';
 
 class ProductController {
 	public async create(req: FastifyRequest, reply: FastifyReply) {
@@ -45,7 +46,7 @@ class ProductController {
 		const body = req.body as ProductUpdate;
 
 		try {
-			const response = await productService.update(id, body);
+			const response = await productService.update(id, body, req.user as User);
 
 			reply.send(response);
 		} catch (e) {
@@ -69,7 +70,7 @@ class ProductController {
 		};
 
 		try {
-			await productService.delete(id);
+			await productService.delete(id, req.user as User);
 
 			reply.send();
 		} catch (e) {
