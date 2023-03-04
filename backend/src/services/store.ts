@@ -4,6 +4,26 @@ import { User } from '../interfaces/user';
 import { HttpException } from '../utils/helpers/http-exception';
 
 class StoreService {
+	async checkIfUserHasStorePermissions(params: {
+		userId: string;
+		storeId: string;
+	}) {
+		const store = await prismaClient.store.findFirst({
+			where: {
+				id: params.storeId,
+				owner_id: params.userId,
+			},
+		});
+
+		if (!store) {
+			throw HttpException.badRequest(
+				'Auth user does not have permission on store, or store does not exists'
+			);
+		}
+
+		return true;
+	}
+
 	async create({ name, description, networks }: StoreCreate, auth: User) {
 		const ownerId = auth.id;
 
@@ -47,9 +67,10 @@ class StoreService {
 			throw HttpException.badRequest('Store not found');
 		}
 
-		if (auth.id !== store.owner_id) {
-			throw HttpException.badRequest('Auth user is not owner of the store');
-		}
+		await this.checkIfUserHasStorePermissions({
+			storeId: id,
+			userId: auth.id,
+		});
 
 		const updatedStore = await prismaClient.store.update({
 			where: {
@@ -72,9 +93,10 @@ class StoreService {
 			throw HttpException.badRequest('Store not found');
 		}
 
-		if (auth.id !== store.owner_id) {
-			throw HttpException.badRequest('Auth user is not owner of the store');
-		}
+		await this.checkIfUserHasStorePermissions({
+			storeId: id,
+			userId: auth.id,
+		});
 
 		await prismaClient.store.delete({
 			where: {
