@@ -1,8 +1,9 @@
 import { prismaClient } from '../database/prisma-client';
 import { HttpException } from '../utils/helpers/http-exception';
 import randomString from '../utils/helpers/random-string';
+import signerService from './signer';
 
-export class UserService {
+class UserService {
 	public async create(publicAddress: string) {
 		const user = await prismaClient.user.create({
 			data: {
@@ -21,9 +22,31 @@ export class UserService {
 			},
 		});
 
-		if (!user) return null;
+		if (!user) throw HttpException.badRequest('User not found');
 
 		return user.nonce;
+	}
+
+	public async authenticate(params: {
+		publicAddress: string;
+		signature: string;
+	}) {
+		const isUserVerified = await signerService.isSignatureVerified({
+			walletId: params.publicAddress,
+			signature: params.signature,
+		});
+
+		if (!isUserVerified) {
+			throw HttpException.unauthorized();
+		}
+
+		const user = await this.findOrCreate({
+			publicAddress: params.publicAddress,
+		});
+
+		if (!user) throw HttpException.badRequest();
+
+		return user;
 	}
 
 	public async updateNonce(publicAddress: string, newNonce: string) {
@@ -57,3 +80,5 @@ export class UserService {
 		return user;
 	}
 }
+
+export default new UserService();

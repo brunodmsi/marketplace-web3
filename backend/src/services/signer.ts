@@ -1,26 +1,16 @@
 import * as ethers from 'ethers';
 import { HttpException } from '../utils/helpers/http-exception';
 import randomString from '../utils/helpers/random-string';
-import { UserService } from './user';
+import userService from './user';
 
-export class SignerService {
-	private userService;
-	private walletId: string;
-
-	constructor(walletId: string) {
-		this.userService = new UserService();
-
-		if (ethers.isAddress(walletId)) {
-			this.walletId = walletId;
-		} else {
-			throw HttpException.badRequest();
-		}
-	}
-
-	async isSignatureVerified(params: { signature: string }): Promise<Boolean> {
+class SignerService {
+	async isSignatureVerified(params: {
+		walletId: string;
+		signature: string;
+	}): Promise<Boolean> {
 		try {
-			const user = await this.userService.findOrCreate({
-				publicAddress: this.walletId,
+			const user = await userService.findOrCreate({
+				publicAddress: params.walletId,
 			});
 
 			if (!user) {
@@ -31,8 +21,8 @@ export class SignerService {
 
 			const recovered = ethers.verifyMessage(msg, params.signature);
 
-			if (ethers.getAddress(this.walletId) === ethers.getAddress(recovered)) {
-				this.userService.updateNonce(this.walletId, randomString(36));
+			if (ethers.getAddress(params.walletId) === ethers.getAddress(recovered)) {
+				userService.updateNonce(params.walletId, randomString(36));
 				return true;
 			}
 
@@ -42,3 +32,5 @@ export class SignerService {
 		}
 	}
 }
+
+export default new SignerService();

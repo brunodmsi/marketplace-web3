@@ -1,7 +1,5 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { HttpException } from '../utils/helpers/http-exception';
-import { UserService } from '../services/user';
-import { SignerService } from '../services/signer';
+import userService from '../services/user';
 
 class UserController {
 	public async getNonce(req: FastifyRequest, reply: FastifyReply) {
@@ -9,15 +7,13 @@ class UserController {
 			publicAddress: string;
 		};
 
-		const userService = new UserService();
-		const nonce = await userService.getNonce(publicAddress);
+		try {
+			const nonce = await userService.getNonce(publicAddress);
 
-		if (!nonce)
-			throw HttpException.badRequest(400, 'User with nonce not found');
-
-		return reply.send({
-			nonce,
-		});
+			reply.send({ nonce });
+		} catch (e) {
+			return e;
+		}
 	}
 
 	public async authenticate(req: FastifyRequest, reply: FastifyReply) {
@@ -25,25 +21,16 @@ class UserController {
 			publicAddress: string;
 			signature: string;
 		};
+		try {
+			const user = await userService.authenticate({ publicAddress, signature });
+			const token = await reply.jwtSign(user);
 
-		const signer = new SignerService(publicAddress);
-
-		const isUserVerified = await signer.isSignatureVerified({ signature });
-
-		if (!isUserVerified) {
-			throw HttpException.unauthorized();
+			return reply.send({
+				jwt: token,
+			});
+		} catch (e) {
+			return e;
 		}
-
-		const userService = new UserService();
-		const user = await userService.findOrCreate({ publicAddress });
-
-		if (!user) throw HttpException.badRequest();
-
-		const token = await reply.jwtSign(user);
-
-		return reply.send({
-			jwt: token,
-		});
 	}
 }
 
