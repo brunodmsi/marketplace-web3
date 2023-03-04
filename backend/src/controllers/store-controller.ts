@@ -38,6 +38,20 @@ class StoreController {
 		}
 	}
 
+	public async get(req: FastifyRequest, reply: FastifyReply) {
+		const { id } = req.params as {
+			id: string;
+		};
+
+		try {
+			const store = await storeService.get(id);
+
+			reply.send(store);
+		} catch (e) {
+			return e;
+		}
+	}
+
 	public async list(_: FastifyRequest, reply: FastifyReply) {
 		try {
 			const stores = await prismaClient.store.findMany();

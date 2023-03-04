@@ -3,6 +3,13 @@ import storeController from '../controllers/store-controller';
 
 const store = async (app: FastifyInstance) => {
 	return [
+		app.get(
+			'/get/:id',
+			{
+				preHandler: app.auth([app.verifyJWT]),
+			},
+			storeController.get
+		),
 		app.put(
 			'/edit/:id',
 			{

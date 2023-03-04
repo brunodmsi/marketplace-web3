@@ -19,6 +19,20 @@ class StoreService {
 		return store;
 	}
 
+	async get(storeId: string) {
+		const store = await prismaClient.store.findFirst({
+			where: {
+				id: storeId,
+			},
+		});
+
+		if (!store) {
+			throw HttpException.badRequest('Store not found');
+		}
+
+		return store;
+	}
+
 	async update(id: string, data: StoreUpdate, auth: User) {
 		const store = await prismaClient.store.findFirst({
 			where: {
