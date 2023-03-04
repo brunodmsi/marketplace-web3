@@ -1,3 +1,5 @@
+import * as ethers from 'ethers';
+
 import { prismaClient } from '../database/prisma-client';
 import { HttpException } from '../utils/helpers/http-exception';
 import randomString from '../utils/helpers/random-string';
@@ -5,6 +7,12 @@ import signerService from './signer';
 
 class UserService {
 	public async create(publicAddress: string) {
+		const isValidAddress = ethers.isAddress(publicAddress);
+
+		if (!isValidAddress) {
+			throw HttpException.badRequest('Public address is not valid');
+		}
+
 		const user = await prismaClient.user.create({
 			data: {
 				public_address: publicAddress,
@@ -31,6 +39,12 @@ class UserService {
 		publicAddress: string;
 		signature: string;
 	}) {
+		const user = await this.findOrCreate({
+			publicAddress: params.publicAddress,
+		});
+
+		if (!user) throw HttpException.badRequest('User not found');
+
 		const isUserVerified = await signerService.isSignatureVerified({
 			walletId: params.publicAddress,
 			signature: params.signature,
@@ -39,12 +53,6 @@ class UserService {
 		if (!isUserVerified) {
 			throw HttpException.unauthorized();
 		}
-
-		const user = await this.findOrCreate({
-			publicAddress: params.publicAddress,
-		});
-
-		if (!user) throw HttpException.badRequest();
 
 		return user;
 	}
