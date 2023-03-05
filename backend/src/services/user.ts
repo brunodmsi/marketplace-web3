@@ -25,10 +25,8 @@ class UserService {
 	}
 
 	public async getNonce(publicAddress: string) {
-		const user = await prismaClient.user.findFirst({
-			where: {
-				public_address: publicAddress,
-			},
+		const user = await this.findOrCreate({
+			publicAddress: publicAddress,
 		});
 
 		if (!user) throw HttpException.badRequest('User not found');
