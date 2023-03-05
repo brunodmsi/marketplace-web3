@@ -38,6 +38,40 @@ class UserCartService {
 
 		return userCart;
 	}
+
+	public async get(id: string) {
+		const userCart = await prismaClient.userCart.findFirst({
+			where: { id },
+			include: {
+				cart_products: true,
+			},
+		});
+
+		if (!userCart) {
+			throw HttpException.badRequest('User Cart not found');
+		}
+
+		const userCartProductsWithItemsTotalValue = [];
+
+		let totalValue = 0;
+		if (userCart.cart_products.length > 0) {
+			for (let i = 0; i < userCart.cart_products.length; i++) {
+				const currCartProduct = userCart.cart_products[i];
+
+				const calculatedValue = currCartProduct.value * currCartProduct.amount;
+				userCartProductsWithItemsTotalValue.push({
+					...currCartProduct,
+					total_value: calculatedValue,
+				});
+
+				totalValue += calculatedValue;
+			}
+		}
+
+		userCart.cart_products = userCartProductsWithItemsTotalValue;
+
+		return { ...userCart, total_cart_value: totalValue };
+	}
 }
 
 export default new UserCartService();

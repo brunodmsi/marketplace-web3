@@ -2,6 +2,13 @@ import { FastifyInstance } from 'fastify';
 import userCartController from '../controllers/user-cart-controller';
 
 const userCart = async (app: FastifyInstance) => {
+	app.get(
+		'/get/:id',
+		{
+			preHandler: app.auth([app.verifyJWT]),
+		},
+		userCartController.get
+	);
 	app.post(
 		'/create',
 		{

@@ -78,6 +78,7 @@ model CartProduct {
 	name String
 	value Float
 	description String?
+	amount Int
 
 	@@map("cart_products")
 }
