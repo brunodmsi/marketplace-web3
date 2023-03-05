@@ -1,4 +1,5 @@
 import * as ethers from 'ethers';
+import { z } from 'zod';
 
 import { prismaClient } from '../database/prisma-client';
 import { HttpException } from '../utils/helpers/http-exception';
@@ -55,6 +56,25 @@ class UserService {
 		}
 
 		return user;
+	}
+
+	public async updateEmail(id: string, email: string) {
+		const schema = z.string().email();
+
+		if (!schema.safeParse(email).success) {
+			throw HttpException.badRequest('Email is not valid');
+		}
+
+		const response = await prismaClient.user.update({
+			where: {
+				id,
+			},
+			data: {
+				email,
+			},
+		});
+
+		return response;
 	}
 
 	public async updateNonce(publicAddress: string, newNonce: string) {

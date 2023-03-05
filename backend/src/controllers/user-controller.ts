@@ -1,4 +1,5 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
+import { User } from '../interfaces/user';
 import userService from '../services/user';
 
 class UserController {
@@ -11,6 +12,23 @@ class UserController {
 			const nonce = await userService.getNonce(publicAddress);
 
 			reply.send({ nonce });
+		} catch (e) {
+			return e;
+		}
+	}
+
+	public async updateEmail(req: FastifyRequest, reply: FastifyReply) {
+		const { email } = req.body as {
+			email: string;
+		};
+
+		try {
+			const response = await userService.updateEmail(
+				(req.user as User).id,
+				email
+			);
+
+			reply.send(response);
 		} catch (e) {
 			return e;
 		}
