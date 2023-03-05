@@ -4,7 +4,7 @@ import userService from '../services/user';
 
 class UserController {
 	public async getNonce(req: FastifyRequest, reply: FastifyReply) {
-		const { publicAddress } = req.body as {
+		const { publicAddress } = req.params as {
 			publicAddress: string;
 		};
 

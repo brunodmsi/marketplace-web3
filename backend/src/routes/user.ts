@@ -17,19 +17,7 @@ const user = async (app: FastifyInstance) => {
 			},
 			userController.updateEmail
 		),
-		app.post(
-			'/get-nonce',
-			{
-				schema: {
-					body: {
-						type: 'object',
-						required: ['publicAddress'],
-						properties: { publicAddress: { type: 'string' } },
-					},
-				},
-			},
-			userController.getNonce
-		),
+		app.get('/get-nonce/:publicAddress', userController.getNonce),
 		app.post(
 			'/authenticate',
 			{
