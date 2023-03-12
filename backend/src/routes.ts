@@ -13,6 +13,16 @@ const health = async (app: FastifyInstance) => {
 	];
 };
 
+import { initTRPC } from '@trpc/server';
+import { z } from 'zod';
+
+export const t = initTRPC.create();
+export const appRouter = t.router({
+	health: t.procedure.input(z.string()).query(async ({ input }) => {
+		return input;
+	}),
+});
+
 export function routes(app: FastifyInstance): FastifyInstance {
 	app.register(health, { prefix: '/health' });
 	app.register(user, { prefix: '/user' });

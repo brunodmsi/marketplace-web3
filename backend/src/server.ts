@@ -1,10 +1,13 @@
+import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify';
+
 import Fastify, { FastifyInstance } from 'fastify';
 import fastifyAuth from '@fastify/auth';
 import fastifyJwt from '@fastify/jwt';
 import fastifyCors from '@fastify/cors';
 
+import { createContext } from './context/';
 import config from './config';
-import { router } from './routes';
+import { appRouter, router } from './routes';
 import { verifyJWT } from './middlewares/authorization';
 
 const mount = async () => {
@@ -25,7 +28,12 @@ const mount = async () => {
 		origin: '*',
 	});
 
-	await router(app);
+	app.register(fastifyTRPCPlugin, {
+		prefix: '/trpc',
+		trpcOptions: { createContext, router: appRouter },
+	});
+
+	// await router(app);
 
 	return {
 		app,
