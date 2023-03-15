@@ -5,9 +5,9 @@ import fastifyAuth from '@fastify/auth';
 import fastifyJwt from '@fastify/jwt';
 import fastifyCors from '@fastify/cors';
 
-import { createContext } from './context/';
 import config from './config';
-import { appRouter, router } from './routes';
+import { createContext } from './trpc/context';
+import { appRouter } from './routes';
 import { verifyJWT } from './middlewares/authorization';
 
 const mount = async () => {

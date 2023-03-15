@@ -4,7 +4,7 @@ import userService from '../services/user';
 
 class UserController {
 	public async getNonce(req: FastifyRequest, reply: FastifyReply) {
-		const { publicAddress } = req.params as {
+		const { publicAddress } = req.query as {
 			publicAddress: string;
 		};
 
@@ -39,6 +39,7 @@ class UserController {
 			publicAddress: string;
 			signature: string;
 		};
+
 		try {
 			const user = await userService.authenticate({ publicAddress, signature });
 			const token = await reply.jwtSign(user);
