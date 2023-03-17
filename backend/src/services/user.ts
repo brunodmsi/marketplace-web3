@@ -57,12 +57,6 @@ class UserService {
 	}
 
 	public async updateEmail(id: string, email: string) {
-		const schema = z.string().email();
-
-		if (!schema.safeParse(email).success) {
-			throw HttpException.badRequest('Email is not valid');
-		}
-
 		const response = await prismaClient.user.update({
 			where: {
 				id,

@@ -1,14 +1,13 @@
-import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 
 import userController from '../controllers/user-controller';
-import { trpcRouter, trpcProcedure } from '../trpc';
+import { trpcRouter, trpcProcedure, trpcProtectedProcedure } from '../trpc';
 
 const userRouter = trpcRouter({
-	'update-email': trpcProcedure
+	'update-email': trpcProtectedProcedure
 		.input(
 			z.object({
-				email: z.string(),
+				email: z.string().email(),
 			})
 		)
 		.mutation(({ ctx }) => {
